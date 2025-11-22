@@ -4,7 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import requests
 
 # Get bot token from environment variable
-TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TOKEN = os.environ.get("TOKEN")
 if not TOKEN:
     raise ValueError("Please set TELEGRAM_BOT_TOKEN in environment variables.")
 
