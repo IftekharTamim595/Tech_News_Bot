@@ -1,66 +1,30 @@
-# bot.py
-
-import os
-import asyncio
-import logging
-import nest_asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import os
 
-# ---------------------------
-# 1. Setup logging
-# ---------------------------
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
-)
-
-# ---------------------------
-# 2. Asyncio patch for Railway / Linux environments
-# ---------------------------
-nest_asyncio.apply()
-
-# ---------------------------
-# 3. Get bot token from environment
-# ---------------------------
+# Get your bot token from environment variable for security
 TOKEN = os.environ.get("TOKEN")
+
 if not TOKEN:
-    raise ValueError("Bot token not set! Add TOKEN in Railway environment variables.")
+    raise ValueError("Please set the TELEGRAM_BOT_TOKEN environment variable.")
 
-# ---------------------------
-# 4. Command handlers
-# ---------------------------
+# /start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Respond to /start"""
-    await update.message.reply_text(
-        "Hello! I am your Tech News Bot. Use /quote to get the latest tech summary."
-    )
+    await update.message.reply_text("Hello! I am your Tech News Bot. Send /news to get updates.")
 
-async def quote(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Respond to /quote with a placeholder tech news summary"""
-    tech_news_samples = [
-        "AI startup raises $50M in funding.",
-        "New Python version released with performance improvements.",
-        "Quantum computing breakthrough announced in Europe.",
-        "Tech giants announce new privacy standards.",
-        "OpenAI releases updated GPT model for developers."
-    ]
-    import random
-    summary = random.choice(tech_news_samples)
-    await update.message.reply_text(f"Tech News Summary: {summary}")
+# /news command
+async def news(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Replace this with AI or news fetch logic
+    await update.message.reply_text("Here is the latest tech news (placeholder).")
 
-# ---------------------------
-# 5. Build application
-# ---------------------------
+# Build the bot
 app = ApplicationBuilder().token(TOKEN).build()
+
+# Add handlers
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("quote", quote))
+app.add_handler(CommandHandler("news", news))
 
-# ---------------------------
-# 6. Run the bot
-# ---------------------------
-asyncio.get_event_loop().create_task(app.run_polling())
-
-# Keep script running
-print("Bot is running...")
-asyncio.get_event_loop().run_forever()
+# Run the bot with polling
+if __name__ == "__main__":
+    print("Bot is starting...")
+    app.run_polling()
