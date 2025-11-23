@@ -8,10 +8,7 @@ TOKEN = os.environ.get("TOKEN")
 if not TOKEN:
     raise ValueError("Please set TELEGRAM_BOT_TOKEN in environment variables.")
 
-# Optional: Get PORT from Railway
-PORT = int(os.environ.get("PORT", 8443))
-
-# Function to remove existing webhook (avoids polling conflict)
+# Delete existing webhook
 def delete_webhook():
     url = f"https://api.telegram.org/bot{TOKEN}/deleteWebhook"
     try:
@@ -23,7 +20,9 @@ def delete_webhook():
     except Exception as e:
         print("Error deleting webhook:", e)
 
-# /start command — description only, does nothing else
+delete_webhook()
+
+# /start command — ONLY shows description
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Hello! I am your Tech News Bot.\n"
@@ -36,27 +35,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/health - Health news"
     )
 
-# Placeholder news function for all news commands
-async def send_news(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# /news and other categories — separate handler
+async def news_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = update.message.text.lstrip("/").lower()
     await update.message.reply_text(f"Here is the latest {category} news (placeholder).")
 
-# Delete any webhook to allow polling
-delete_webhook()
-
-# Build the bot application
+# Build the bot
 app = ApplicationBuilder().token(TOKEN).build()
 
 # Add handlers
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("news", send_news))
-app.add_handler(CommandHandler("ai", send_news))
-app.add_handler(CommandHandler("entertainment", send_news))
-app.add_handler(CommandHandler("sports", send_news))
-app.add_handler(CommandHandler("business", send_news))
-app.add_handler(CommandHandler("health", send_news))
+app.add_handler(CommandHandler("news", news_category))
+app.add_handler(CommandHandler("ai", news_category))
+app.add_handler(CommandHandler("entertainment", news_category))
+app.add_handler(CommandHandler("sports", news_category))
+app.add_handler(CommandHandler("business", news_category))
+app.add_handler(CommandHandler("health", news_category))
 
-# Run the bot with polling
+# Run the bot
 if __name__ == "__main__":
     print("Bot is starting...")
     app.run_polling()
