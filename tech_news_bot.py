@@ -1,65 +1,72 @@
 import os
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 import requests
 
-# Get bot token from environment variable
 TOKEN = os.environ.get("TOKEN")
 if not TOKEN:
     raise ValueError("Please set TELEGRAM_BOT_TOKEN in environment variables.")
 
-# Delete existing webhook
+# Delete webhook
 def delete_webhook():
     url = f"https://api.telegram.org/bot{TOKEN}/deleteWebhook"
     try:
         r = requests.get(url)
-        if r.status_code == 200:
-            print("Existing webhook deleted:", r.json())
-        else:
-            print("Failed to delete webhook:", r.text)
+        print("Webhook status:", r.text)
     except Exception as e:
         print("Error deleting webhook:", e)
 
 delete_webhook()
 
-# /start command — ONLY shows description and available commands
+# /start command – ONLY description
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Hello! I am your Tech News Bot.\n\n"
-        "You can use the following commands to get news:\n"
-        "/news - Latest tech news\n"
+        "Available commands:\n"
+        "/news - Tech news\n"
         "/ai - AI news\n"
         "/entertainment - Entertainment news\n"
         "/sports - Sports news\n"
         "/business - Business news\n"
         "/health - Health news\n\n"
-        "Just type any of the commands above to get started."
+        "Choose a category to get updates."
     )
 
-# /news and other categories — shared handler
-async def news_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    category = update.message.text.lstrip("/").lower()
+# This function will forward allowed commands to n8n
+async def forward_to_n8n(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_text = update.message.text.lower()
 
-    # Ignore /start so it does nothing
-    if category == "start":
+    # List of allowed commands
+    valid_commands = [
+        "/news", "/ai", "/entertainment",
+        "/sports", "/business", "/health"
+    ]
+
+    # Ignore /start safely
+    if user_text == "/start":
+        return  # DO NOTHING. No forwarding.
+
+    if user_text in valid_commands:
+        # FORWARD TO N8N WORKFLOW
+        # Replace with your actual n8n webhook URL
+        n8n_webhook = os.environ.get("N8N_WEBHOOK_URL")
+
+        if n8n_webhook:
+            requests.post(n8n_webhook, json={"message": user_text})
+
         return
 
-    # Placeholder for actual news logic
-    await update.message.reply_text(f"Here is the latest {category.capitalize()} news (placeholder).")
-
-# Build the bot
+# Build bot
 app = ApplicationBuilder().token(TOKEN).build()
 
-# Add handlers
+# Command handlers
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("news", news_category))
-app.add_handler(CommandHandler("ai", news_category))
-app.add_handler(CommandHandler("entertainment", news_category))
-app.add_handler(CommandHandler("sports", news_category))
-app.add_handler(CommandHandler("business", news_category))
-app.add_handler(CommandHandler("health", news_category))
 
-# Run the bot
+# Message handler for forwarding to n8n
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, forward_to_n8n))
+app.add_handler(MessageHandler(filters.COMMAND, forward_to_n8n))
+
+# Run bot
 if __name__ == "__main__":
-    print("Bot is starting...")
+    print("Bot is running...")
     app.run_polling()
