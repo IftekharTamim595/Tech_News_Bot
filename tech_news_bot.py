@@ -36,11 +36,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Just type any of the commands above to get started."
     )
 
-
-# /news and other categories — separate handler
+# /news and other categories — shared handler
 async def news_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
     category = update.message.text.lstrip("/").lower()
-    await update.message.reply_text(f"Here is the latest {category} news (placeholder).")
+
+    # Ignore /start so it does nothing
+    if category == "start":
+        return
+
+    # Placeholder for actual news logic
+    await update.message.reply_text(f"Here is the latest {category.capitalize()} news (placeholder).")
 
 # Build the bot
 app = ApplicationBuilder().token(TOKEN).build()
