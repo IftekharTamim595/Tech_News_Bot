@@ -23,11 +23,11 @@ def delete_webhook():
     except Exception as e:
         print("Error deleting webhook:", e)
 
-# /start command
+# /start command — description only, does nothing else
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Hello! I am your Tech News Bot.\n"
-        "You can get news by sending these commands:\n"
+        "Use the following commands to get news:\n"
         "/news - Latest tech news\n"
         "/ai - AI news\n"
         "/entertainment - Entertainment news\n"
@@ -36,12 +36,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/health - Health news"
     )
 
-# Generic function to send news based on category
+# Placeholder news function for all news commands
 async def send_news(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    category = context.args[0] if context.args else "general"
-    # TODO: Replace the placeholder below with your n8n workflow call or API call
-    message = f"Here is the latest {category.capitalize()} news (placeholder)."
-    await update.message.reply_text(message)
+    category = update.message.text.lstrip("/").lower()
+    await update.message.reply_text(f"Here is the latest {category} news (placeholder).")
 
 # Delete any webhook to allow polling
 delete_webhook()
@@ -51,7 +49,7 @@ app = ApplicationBuilder().token(TOKEN).build()
 
 # Add handlers
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("news", send_news, pass_args=True))
+app.add_handler(CommandHandler("news", send_news))
 app.add_handler(CommandHandler("ai", send_news))
 app.add_handler(CommandHandler("entertainment", send_news))
 app.add_handler(CommandHandler("sports", send_news))
