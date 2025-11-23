@@ -22,18 +22,20 @@ def delete_webhook():
 
 delete_webhook()
 
-# /start command — ONLY shows description
+# /start command — ONLY shows description and available commands
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Hello! I am your Tech News Bot.\n"
-        "Use the following commands to get news:\n"
+        "Hello! I am your Tech News Bot.\n\n"
+        "You can use the following commands to get news:\n"
         "/news - Latest tech news\n"
         "/ai - AI news\n"
         "/entertainment - Entertainment news\n"
         "/sports - Sports news\n"
         "/business - Business news\n"
-        "/health - Health news"
+        "/health - Health news\n\n"
+        "Just type any of the commands above to get started."
     )
+
 
 # /news and other categories — separate handler
 async def news_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
