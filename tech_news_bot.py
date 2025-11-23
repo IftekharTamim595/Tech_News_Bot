@@ -43,6 +43,32 @@ app = ApplicationBuilder().token(TOKEN).build()
 # Add handlers
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("news", news))
+# /ai command
+async def ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Here is the latest AI news (placeholder).")
+
+# /entertainment command
+async def entertainment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Here is the latest Entertainment news (placeholder).")
+
+# /sports command
+async def sports(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Here is the latest Sports news (placeholder).")
+
+# /business command
+async def business(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Here is the latest Business news (placeholder).")
+
+# /health command
+async def health(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Here is the latest Health news (placeholder).")
+
+# Add handlers for the new commands
+app.add_handler(CommandHandler("ai", ai))
+app.add_handler(CommandHandler("entertainment", entertainment))
+app.add_handler(CommandHandler("sports", sports))
+app.add_handler(CommandHandler("business", business))
+app.add_handler(CommandHandler("health", health))
 
 # Run the bot with polling (Railway uses a dynamic PORT but polling ignores it)
 if __name__ == "__main__":
